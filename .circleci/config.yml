@@ -49,7 +49,7 @@ workflows:
               only:
                 - master
     
-integration0-tests:
+integration-tests:
   docker:
     - image: circleci/node:lts
     image: mongo 4.0
