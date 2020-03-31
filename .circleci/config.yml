@@ -35,6 +35,12 @@ workflows:
   build-and-packge:
     jobs:
       - ci-build
+      - integration-tests:
+        requires: 
+          - ci-build
+      - sast:
+        requires:
+          - ci-build
       - pack:
           requires:
             - ci-build
@@ -43,10 +49,30 @@ workflows:
               only:
                 - master
     
-integration0-tests:
+integration-tests:
   docker:
     - image: circleci/node:lts
     image: mongo 4.0
   environment:
     APP-PORT: 4000
+
+sast:
+  docker:
+    - image: circleci/node.:lts
+    steps:
+      - checkout
+      - run:
+        name: Install NodeJsScan
+        command: |
+        nodejsscan -d ./ -o sast-output.json
+        sudo apt update
+        sudo apt install python3-pip
+        pip3 install nodejsscan
+      
+  -store_artifacts:
+    - run:
+      name: Parse sast report
+      command: |
+      # exit with a non-zero exit code if there are any security issues exit $(cat sast-output,json | jq .total_count.sec)
+    path: sast-output.json
             
