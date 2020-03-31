@@ -64,8 +64,15 @@ sast:
       - run:
         name: Install NodeJsScan
         command: |
-        nodejsscan -d ./
+        nodejsscan -d ./ -o sast-output.json
         sudo apt update
         sudo apt install python3-pip
         pip3 install nodejsscan
+      
+  -store_artifacts:
+    - run:
+      name: Parse sast report
+      command: |
+      # exit with a non-zero exit code if there are any security issues exit $(cat sast-output,json | jq .total_count.sec)
+    path: sast-output.json
             
